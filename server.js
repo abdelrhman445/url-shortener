@@ -55,7 +55,7 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
 
-// ==================== 🔧 التعديل المهم: ترتيب Routes بشكل صحيح ====================
+// ==================== 🔧 الترتيب النهائي للـ Routes ====================
 // Routes العامة (بدون auth)
 app.use('/', require('./src/routes/auth'));
 
@@ -84,6 +84,7 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use('*', (req, res) => {
+  console.log(`❌ 404 for: ${req.originalUrl}`);
   res.status(404).render('404');
 });
 
