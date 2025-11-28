@@ -5,26 +5,18 @@ const useragent = require('useragent');
 
 const router = express.Router();
 
-// قائمة بالـ routes المحجوزة
-const reservedPaths = [
-  'login', 'register', 'logout', 'dashboard', 'admin', 
-  'health', 'favicon.ico', 'home', 'api', 'me'
-];
-
-router.get('/:shortId', async (req, res, next) => {
+// ==================== 🔧 إصلاح نهائي: جعل الـ redirect يعمل بدون auth ====================
+router.get('/:shortId', async (req, res) => {
   try {
-    // تحقق إذا كان المسار محجوزاً
-    if (reservedPaths.includes(req.params.shortId)) {
-      console.log(`🛑 Reserved path accessed: ${req.params.shortId}`);
-      return next(); // انتقل للـ route التالي
-    }
+    console.log(`🔗 Redirect attempt for shortId: ${req.params.shortId}`);
 
-    console.log(`🔗 Redirect attempt for: ${req.params.shortId}`);
-
-    const link = await Link.findOne({ shortId: req.params.shortId, isActive: true });
+    const link = await Link.findOne({ 
+      shortId: req.params.shortId, 
+      isActive: true 
+    });
     
     if (!link) {
-      console.log(`❌ Link not found: ${req.params.shortId}`);
+      console.log(`❌ Link not found or inactive: ${req.params.shortId}`);
       return res.status(404).render('404');
     }
 
@@ -47,6 +39,7 @@ router.get('/:shortId', async (req, res, next) => {
       referrer: req.get('referer') || 'Direct'
     });
 
+    // Redirect to the original URL
     res.redirect(link.originalUrl);
   } catch (error) {
     console.error('Redirect error:', error);
