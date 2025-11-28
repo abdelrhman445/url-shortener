@@ -24,6 +24,7 @@ const loginValidation = [
   body('password').notEmpty().withMessage('كلمة المرور مطلوبة')
 ];
 
+// ==================== 🔧 إصلاح: إرجاع المسارات إلى وضعها الطبيعي ====================
 // Render pages
 router.get('/login', (req, res) => {
   console.log('✅ GET /login route accessed');
@@ -40,10 +41,11 @@ router.get('/', (req, res) => {
   res.render('home');
 });
 
-// API routes
+// API routes - استخدام نفس المسارات بدون /api
 router.post('/login', authLimiter, loginValidation, login);
 router.post('/register', authLimiter, registerValidation, register);
 router.post('/logout', auth, logout);
 router.get('/me', auth, getMe);
+// ==================== نهاية الإصلاح ====================
 
 module.exports = router;
