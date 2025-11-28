@@ -105,7 +105,10 @@ exports.createLink = async (req, res) => {
         originalUrl: link.originalUrl,
         clicks: link.clicks,
         createdAt: link.createdAt,
-        _id: link._id
+        _id: link._id,
+        // إرجاع رابط المعاينة الجديد
+        previewUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/r/${link.shortId}`,
+        directUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/go/${link.shortId}`
       }
     });
   } catch (error) {
