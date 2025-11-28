@@ -5,13 +5,30 @@ const useragent = require('useragent');
 
 const router = express.Router();
 
-router.get('/:shortId', async (req, res) => {
+// قائمة بالـ routes المحجوزة
+const reservedPaths = [
+  'login', 'register', 'logout', 'dashboard', 'admin', 
+  'health', 'favicon.ico', 'home', 'api', 'me'
+];
+
+router.get('/:shortId', async (req, res, next) => {
   try {
+    // تحقق إذا كان المسار محجوزاً
+    if (reservedPaths.includes(req.params.shortId)) {
+      console.log(`🛑 Reserved path accessed: ${req.params.shortId}`);
+      return next(); // انتقل للـ route التالي
+    }
+
+    console.log(`🔗 Redirect attempt for: ${req.params.shortId}`);
+
     const link = await Link.findOne({ shortId: req.params.shortId, isActive: true });
     
     if (!link) {
+      console.log(`❌ Link not found: ${req.params.shortId}`);
       return res.status(404).render('404');
     }
+
+    console.log(`✅ Link found, redirecting to: ${link.originalUrl}`);
 
     // Update click count
     link.clicks += 1;
