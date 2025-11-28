@@ -8,7 +8,7 @@ const router = express.Router();
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
+  max: 10, // زيادة الحد ليكون أكثر مرونة
   message: { error: 'محاولات تسجيل دخول كثيرة، حاول مرة أخرى بعد 15 دقيقة' }
 });
 
@@ -24,28 +24,16 @@ const loginValidation = [
   body('password').notEmpty().withMessage('كلمة المرور مطلوبة')
 ];
 
-// ==================== 🔧 إصلاح: إرجاع المسارات إلى وضعها الطبيعي ====================
-// Render pages
-router.get('/login', (req, res) => {
-  console.log('✅ GET /login route accessed');
-  res.render('auth/login');
-});
-
-router.get('/register', (req, res) => {
-  console.log('✅ GET /register route accessed');
-  res.render('auth/register');
-});
-
-router.get('/', (req, res) => {
-  console.log('✅ Home route accessed');
-  res.render('home');
-});
-
-// API routes - استخدام نفس المسارات بدون /api
-router.post('/login', authLimiter, loginValidation, login);
+// API routes
 router.post('/register', authLimiter, registerValidation, register);
+router.post('/login', authLimiter, loginValidation, login);
 router.post('/logout', auth, logout);
 router.get('/me', auth, getMe);
-// ==================== نهاية الإصلاح ====================
 
-module.exports = router;
+// Render pages
+router.get('/login', (req, res) => res.render('auth/login'));
+router.get('/register', (req, res) => res.render('auth/register'));
+router.get('/', (req, res) => res.render('home'));
+router.get('/logout', auth, logout);
+
+module.exports = router; 
