@@ -90,7 +90,8 @@ exports.login = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax'
     });
 
     res.json({
@@ -110,11 +111,26 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
-  res.cookie('token', '', {
-    httpOnly: true,
-    expires: new Date(0)
-  });
-  res.json({ success: true, message: 'تم تسجيل الخروج بنجاح' });
+  try {
+    // مسح الكوكي بشكل صحيح
+    res.cookie('token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(0),
+      path: '/',
+      sameSite: 'lax'
+    });
+
+    // إرجاع رد مناسب حسب نوع الطلب
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      res.json({ success: true, message: 'تم تسجيل الخروج بنجاح' });
+    } else {
+      res.redirect('/login');
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'خطأ في تسجيل الخروج' });
+  }
 };
 
 exports.getMe = async (req, res) => {
