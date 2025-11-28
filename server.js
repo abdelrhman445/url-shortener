@@ -55,12 +55,14 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
 
-// ==================== 🔧 التعديل المهم: وضع redirect routes أولاً ====================
-// يجب أن تكون routes التوجيه قبل أي middleware يحتاج auth
+// ==================== 🔧 التعديل المهم: ترتيب Routes بشكل صحيح ====================
+// Routes العامة (بدون auth)
+app.use('/', require('./src/routes/auth'));
+
+// Routes التوجيه (يجب أن تكون قبل الـ routes المحمية)
 app.use('/', require('./src/routes/redirect'));
 
-// ثم routes الأخرى التي تحتاج auth
-app.use('/', require('./src/routes/auth'));
+// Routes المحمية (تتطلب auth)
 app.use('/dashboard', require('./src/routes/dashboard'));
 app.use('/admin', require('./src/routes/admin'));
 // ==================== نهاية التعديل ====================
