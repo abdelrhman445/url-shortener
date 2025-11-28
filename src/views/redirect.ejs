@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جاري التوجيه - <%= shortId %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .redirect-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .url-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            word-break: break-all;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .original-url {
+            color: #495057;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .short-url {
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .timer {
+            font-size: 18px;
+            color: #666;
+            margin: 20px 0;
+        }
+        
+        .manual-redirect {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .security-note {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-container">
+        <div class="loader"></div>
+        
+        <h1>جاري توجيهك إلى الرابط المطلوب</h1>
+        
+        <div class="url-display">
+            <div class="original-url">
+                <strong>الرابط الوجهة:</strong><br>
+                <span id="targetUrl"><%= targetUrl %></span>
+            </div>
+            <div class="short-url">
+                الرابط المختصر: <%= baseUrl %>/<%= shortId %>
+            </div>
+        </div>
+        
+        <div class="timer" id="timer">
+            سيتم التوجيه تلقائياً خلال: <span id="countdown">5</span> ثواني
+        </div>
+        
+        <div class="manual-redirect">
+            <p>إذا لم يتم التوجيه تلقائياً، يرجى الضغط على الزر:</p>
+            <a href="/go/<%= shortId %>" class="btn" id="redirectBtn">
+                انتقل إلى الرابط الآن
+            </a>
+        </div>
+        
+        <div class="security-note">
+            🔒 هذا الرابط آمن ومُقدم عبر منصة تقصير الروابط
+        </div>
+    </div>
+
+    <script>
+        let countdown = 5;
+        const countdownElement = document.getElementById('countdown');
+        const redirectBtn = document.getElementById('redirectBtn');
+        const targetUrl = '<%= targetUrl %>';
+
+        // عد تنازلي للتوجيه التلقائي
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = '/go/<%= shortId %>';
+            }
+        }, 1000);
+
+        // تقصير الرابط الطويل لعرضه بشكل أفضل
+        const urlElement = document.getElementById('targetUrl');
+        const fullUrl = urlElement.textContent;
+        if (fullUrl.length > 60) {
+            urlElement.textContent = fullUrl.substring(0, 60) + '...';
+            urlElement.title = fullUrl;
+        }
+    </script>
+</body>
+</html>
