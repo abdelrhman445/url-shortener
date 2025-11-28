@@ -4,11 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جاري التوجيه - <%= shortId %></title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
         }
         
         body {
@@ -21,24 +31,70 @@
             padding: 20px;
         }
         
-        .redirect-container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        .redirect-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
             text-align: center;
-            max-width: 500px;
+            max-width: 520px;
             width: 100%;
+            position: relative;
+            overflow: hidden;
         }
         
-        .loader {
-            width: 60px;
-            height: 60px;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #667eea;
+        .redirect-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .loader-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+        }
+        
+        .circular-loader {
+            width: 100%;
+            height: 100%;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 30px;
+        }
+        
+        .loader-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--primary);
+            font-size: 1.5rem;
         }
         
         @keyframes spin {
@@ -47,98 +103,274 @@
         }
         
         h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 700;
         }
         
-        .url-display {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            word-break: break-all;
-            border: 2px dashed #dee2e6;
-        }
-        
-        .original-url {
-            color: #495057;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .short-url {
-            color: #667eea;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        
-        .timer {
-            font-size: 18px;
-            color: #666;
-            margin: 20px 0;
-        }
-        
-        .manual-redirect {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        
-        .btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
+        .subtitle {
+            color: var(--gray);
+            margin-bottom: 35px;
             font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
+            line-height: 1.6;
+        }
+        
+        .url-card {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 16px;
+            margin: 25px 0;
+            border: 1px solid #e2e8f0;
+            text-align: right;
             transition: all 0.3s ease;
         }
         
-        .btn:hover {
-            background: #5a6fd8;
+        .url-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
         
-        .security-note {
-            font-size: 12px;
-            color: #6c757d;
+        .url-label {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .url-value {
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 600;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+        
+        .short-url {
+            color: var(--primary);
+            font-weight: 700;
             margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e2e8f0;
+        }
+        
+        .countdown-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 25px 0;
+        }
+        
+        .countdown-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .countdown-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary);
+            width: 100%;
+            animation: countdown 5s linear forwards;
+            transform-origin: left;
+        }
+        
+        @keyframes countdown {
+            0% { transform: scaleX(1); }
+            100% { transform: scaleX(0); }
+        }
+        
+        .action-section {
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: none;
+            margin-right: 15px;
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            margin-top: 25px;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .feature-item {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .feature-text {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .redirect-card {
+                padding: 40px 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 14px 30px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="redirect-container">
-        <div class="loader"></div>
+    <div class="redirect-card">
+        <div class="logo">
+            <i class="fas fa-link"></i>
+            <span>URL Shortener</span>
+        </div>
         
-        <h1>جاري توجيهك إلى الرابط المطلوب</h1>
+        <div class="loader-container">
+            <div class="circular-loader"></div>
+            <div class="loader-icon">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
         
-        <div class="url-display">
-            <div class="original-url">
-                <strong>الرابط الوجهة:</strong><br>
-                <span id="targetUrl"><%= targetUrl %></span>
+        <h1>جاري توجيهك إلى الوجهة</h1>
+        <p class="subtitle">يتم تحويلك تلقائياً إلى الرابط المطلوب خلال ثوانٍ قليلة</p>
+        
+        <div class="url-card">
+            <div class="url-label">
+                <i class="fas fa-globe"></i>
+                الرابط الوجهة:
+            </div>
+            <div class="url-value" id="targetUrl">
+                <%= targetUrl %>
             </div>
             <div class="short-url">
+                <i class="fas fa-link"></i>
                 الرابط المختصر: <%= baseUrl %>/<%= shortId %>
             </div>
         </div>
         
-        <div class="timer" id="timer">
-            سيتم التوجيه تلقائياً خلال: <span id="countdown">5</span> ثواني
+        <div class="countdown-section">
+            <div class="countdown-text">سيتم التوجيه تلقائياً خلال</div>
+            <div class="countdown-number" id="countdown">5</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
         </div>
         
-        <div class="manual-redirect">
-            <p>إذا لم يتم التوجيه تلقائياً، يرجى الضغط على الزر:</p>
+        <div class="action-section">
             <a href="/go/<%= shortId %>" class="btn" id="redirectBtn">
-                انتقل إلى الرابط الآن
+                <i class="fas fa-external-link-alt"></i>
+                انتقل الآن
             </a>
+            <button class="btn btn-outline" onclick="copyShortUrl()">
+                <i class="fas fa-copy"></i>
+                نسخ الرابط
+            </button>
         </div>
         
-        <div class="security-note">
-            🔒 هذا الرابط آمن ومُقدم عبر منصة تقصير الروابط
+        <div class="security-badge">
+            <i class="fas fa-shield-alt"></i>
+            رابط آمن ومُفحوص
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="feature-text">توجيه سريع</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="feature-text">إحصائيات متقدمة</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="feature-text">حماية كاملة</div>
+            </div>
         </div>
     </div>
 
@@ -146,7 +378,6 @@
         let countdown = 5;
         const countdownElement = document.getElementById('countdown');
         const redirectBtn = document.getElementById('redirectBtn');
-        const targetUrl = '<%= targetUrl %>';
 
         // عد تنازلي للتوجيه التلقائي
         const timer = setInterval(() => {
@@ -159,13 +390,49 @@
             }
         }, 1000);
 
+        // نسخ الرابط المختصر
+        function copyShortUrl() {
+            const shortUrl = '<%= baseUrl %>/<%= shortId %>';
+            navigator.clipboard.writeText(shortUrl).then(() => {
+                const btn = event.target.closest('.btn');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+                btn.style.background = '#10b981';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
         // تقصير الرابط الطويل لعرضه بشكل أفضل
         const urlElement = document.getElementById('targetUrl');
         const fullUrl = urlElement.textContent;
-        if (fullUrl.length > 60) {
-            urlElement.textContent = fullUrl.substring(0, 60) + '...';
+        
+        try {
+            const url = new URL(fullUrl);
+            const displayUrl = url.hostname + (url.pathname !== '/' ? url.pathname.substring(0, 30) + (url.pathname.length > 30 ? '...' : '') : '');
+            urlElement.textContent = displayUrl;
             urlElement.title = fullUrl;
+        } catch (e) {
+            if (fullUrl.length > 50) {
+                urlElement.textContent = fullUrl.substring(0, 50) + '...';
+                urlElement.title = fullUrl;
+            }
         }
+
+        // إضافة تأثير عند التحميل
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.redirect-card').style.opacity = '0';
+            document.querySelector('.redirect-card').style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                document.querySelector('.redirect-card').style.transition = 'all 0.6s ease';
+                document.querySelector('.redirect-card').style.opacity = '1';
+                document.querySelector('.redirect-card').style.transform = 'translateY(0)';
+            }, 100);
+        });
     </script>
 </body>
 </html>
