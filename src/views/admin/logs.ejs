@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجلات النظام - URL Shortener Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .admin-sidebar {
+            background: #2d3748;
+            color: white;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 2rem 0;
+            overflow-y: auto;
+        }
+
+        .admin-content {
+            margin-right: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .sidebar-links {
+            padding: 1rem 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #4a5568;
+            color: white;
+            border-right: 4px solid #667eea;
+        }
+
+        .user-info {
+            padding: 1.5rem;
+            background: #4a5568;
+            margin: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .badge-warning {
+            background: #feebc8;
+            color: #744210;
+            border: 1px solid #fbd38d;
+        }
+
+        .badge-info {
+            background: #bee3f8;
+            color: #2a4365;
+            border: 1px solid #90cdf4;
+        }
+
+        .badge-danger {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .badge-primary {
+            background: #667eea;
+            color: white;
+            border: 1px solid #5a6fd8;
+        }
+
+        .badge-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f7fafc;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 1.25rem 1rem;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table tr:hover {
+            background: #f7fafc;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 45px;
+        }
+
+        .pagination button:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+            border: 1px solid;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #276749;
+            border-color: #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fff5f5;
+            color: #c53030;
+            border-color: #feb2b2;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .loading::before {
+            content: "⏳";
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .log-details {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .log-details:hover {
+            white-space: normal;
+            overflow: visible;
+            background: #f7fafc;
+            padding: 0.5rem;
+            border-radius: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+            min-width: 150px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .admin-content {
+                margin-right: 0;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+            }
+            
+            .filter-select {
+                width: 100%;
+            }
+            
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Icons */
+        .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .icon-log { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/%3E%3C/svg%3E"); }
+        .icon-refresh { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'/%3E%3C/svg%3E"); }
+    </style>
+</head>
+<body>
+    <div class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="logo">URL Shortener Pro</div>
+            <div class="user-info">
+                <div style="font-weight: bold; margin-bottom: 0.5rem;"><%= user.name %></div>
+                <div style="font-size: 0.9rem; color: #cbd5e0;"><%= user.email %></div>
+                <span class="badge badge-success" style="margin-top: 0.5rem;">أدمن</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-links">
+            <a href="/admin" class="sidebar-link">📊 لوحة التحكم</a>
+            <a href="/admin/users" class="sidebar-link">👥 إدارة المستخدمين</a>
+            <a href="/admin/links" class="sidebar-link">🔗 إدارة الروابط</a>
+            <a href="/admin/logs" class="sidebar-link active">📝 سجلات النظام</a>
+            <a href="/dashboard" class="sidebar-link">⚙️ لوحة المستخدم</a>
+           <a href="/logout" class="sidebar-link">🚪 تسجيل الخروج</a>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <div class="stats-overview" id="statsOverview">
+            <div class="stat-card">
+                <div class="stat-number" id="totalLogs">0</div>
+                <div class="stat-label">إجمالي السجلات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="todayLogs">0</div>
+                <div class="stat-label">سجلات اليوم</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="uniqueUsers">0</div>
+                <div class="stat-label">مستخدمين فاعلين</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="icon icon-log"></span>
+                    سجلات النظام
+                </h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button id="refreshBtn" class="btn btn-primary">
+                        <span class="icon icon-refresh"></span>
+                        تحديث
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-controls">
+                <select id="actionFilter" class="filter-select">
+                    <option value="">جميع الإجراءات</option>
+                    <option value="REGISTER">تسجيل جديد</option>
+                    <option value="LOGIN">تسجيل دخول</option>
+                    <option value="CREATE_LINK">إنشاء رابط</option>
+                    <option value="DELETE_LINK">حذف رابط</option>
+                    <option value="ACTIVATE_USER">تفعيل مستخدم</option>
+                    <option value="DEACTIVATE_USER">تعطيل مستخدم</option>
+                    <option value="CHANGE_ROLE">تغيير دور</option>
+                </select>
+                
+                <select id="userFilter" class="filter-select">
+                    <option value="">جميع المستخدمين</option>
+                </select>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>الإجراء</th>
+                            <th>المستخدم</th>
+                            <th>التفاصيل</th>
+                            <th>عنوان IP</th>
+                            <th>الوقت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTable">
+                        <tr>
+                            <td colspan="5" class="loading">جاري تحميل البيانات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <!-- سيتم ملؤها بالجافاسكريبت -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentActionFilter = '';
+        let currentUserFilter = '';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLogs();
+            loadStats();
+            setupFilters();
+            
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                loadLogs(currentPage);
+                showAlert('✅ تم تحديث البيانات', 'success');
+            });
+
+            document.getElementById('actionFilter').addEventListener('change', function() {
+                currentActionFilter = this.value;
+                currentPage = 1;
+                loadLogs(currentPage);
+            });
+
+            document.getElementById('userFilter').addEventListener('change', function() {
+                currentUserFilter = this.value;
+                currentPage = 1;
+                loadLogs(currentPage);
+            });
+        });
+
+        async function loadLogs(page = 1) {
+            try {
+                showLoading();
+                let url = `/admin/logs/data?page=${page}`;
+                if (currentActionFilter) {
+                    url += `&action=${currentActionFilter}`;
+                }
+                if (currentUserFilter) {
+                    url += `&user=${currentUserFilter}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success) {
+                    renderLogs(data.logs);
+                    renderPagination(data.page, data.pages);
+                    updateStats(data.logs);
+                } else {
+                    showAlert('حدث خطأ في تحميل البيانات', 'error');
+                }
+            } catch (error) {
+                showAlert('حدث خطأ في الاتصال بالسيرفر', 'error');
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/admin/logs/data?page=1&limit=1000');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStats(data.logs);
+                    populateUserFilter(data.logs);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function updateStats(logs) {
+            const totalLogs = logs.length;
+            const today = new Date().toDateString();
+            const todayLogs = logs.filter(log => new Date(log.createdAt).toDateString() === today).length;
+            const uniqueUsers = [...new Set(logs.map(log => log.userEmail).filter(email => email))].length;
+
+            document.getElementById('totalLogs').textContent = totalLogs.toLocaleString();
+            document.getElementById('todayLogs').textContent = todayLogs.toLocaleString();
+            document.getElementById('uniqueUsers').textContent = uniqueUsers.toLocaleString();
+        }
+
+        function populateUserFilter(logs) {
+            const userFilter = document.getElementById('userFilter');
+            const uniqueUsers = [...new Set(logs.map(log => log.userEmail).filter(email => email))];
+            
+            uniqueUsers.forEach(email => {
+                const option = document.createElement('option');
+                option.value = email;
+                option.textContent = email;
+                userFilter.appendChild(option);
+            });
+        }
+
+        function setupFilters() {
+            // يمكن إضافة المزيد من إعدادات الفلترة هنا
+        }
+
+        function renderLogs(logs) {
+            const tbody = document.getElementById('logsTable');
+            tbody.innerHTML = '';
+
+            if (logs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <div>📝</div>
+                            <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">لا توجد سجلات</div>
+                            <div style="color: #a0aec0;">لم يتم العثور على سجلات تطابق فلترتك</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>
+                        <span class="action-badge ${getActionBadgeClass(log.action)}">
+                            ${getActionIcon(log.action)}
+                            ${getActionText(log.action)}
+                        </span>
+                    </td>
+                    <td>
+                        <strong>${log.userId ? log.userEmail : 'النظام'}</strong>
+                    </td>
+                    <td class="log-details" title="${getActionDetails(log.action, log.details)}">
+                        ${getActionDetails(log.action, log.details)}
+                    </td>
+                    <td>
+                        <code>${log.ipAddress || 'غير متوفر'}</code>
+                    </td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <span style="font-weight: 600;">${new Date(log.createdAt).toLocaleDateString('ar-EG')}</span>
+                            <span style="color: #718096; font-size: 0.8rem;">${new Date(log.createdAt).toLocaleTimeString('ar-EG')}</span>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderPagination(currentPage, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '‹ السابق';
+                prevBtn.onclick = () => loadLogs(currentPage - 1);
+                pagination.appendChild(prevBtn);
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.className = i === currentPage ? 'active' : '';
+                button.onclick = () => loadLogs(i);
+                pagination.appendChild(button);
+            }
+
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = 'التالي ›';
+                nextBtn.onclick = () => loadLogs(currentPage + 1);
+                pagination.appendChild(nextBtn);
+            }
+        }
+
+        function getActionText(action) {
+            const actions = {
+                'REGISTER': 'تسجيل جديد',
+                'LOGIN': 'تسجيل دخول',
+                'CREATE_LINK': 'إنشاء رابط',
+                'DELETE_LINK': 'حذف رابط',
+                'ACTIVATE_USER': 'تفعيل مستخدم',
+                'DEACTIVATE_USER': 'تعطيل مستخدم',
+                'CHANGE_ROLE': 'تغيير دور',
+                'ADMIN_DELETE_LINK': 'حذف رابط (أدمن)',
+                'ACTIVATE_LINK': 'تفعيل رابط',
+                'DEACTIVATE_LINK': 'تعطيل رابط'
+            };
+            return actions[action] || action;
+        }
+
+        function getActionDetails(action, details) {
+            if (!details) return '-';
+            
+            switch(action) {
+                case 'CREATE_LINK':
+                    return `إنشاء رابط: ${details.shortId}`;
+                case 'DELETE_LINK':
+                case 'ADMIN_DELETE_LINK':
+                    return `حذف رابط: ${details.linkId || details.shortId || 'غير معروف'}`;
+                case 'ACTIVATE_USER':
+                case 'DEACTIVATE_USER':
+                    return `المستخدم: ${details.targetUserEmail}`;
+                case 'CHANGE_ROLE':
+                    return `من ${details.oldRole} إلى ${details.newRole}`;
+                default:
+                    return JSON.stringify(details);
+            }
+        }
+
+        function getActionBadgeClass(action) {
+            const classes = {
+                'REGISTER': 'badge-success',
+                'LOGIN': 'badge-primary',
+                'CREATE_LINK': 'badge-info',
+                'DELETE_LINK': 'badge-danger',
+                'ADMIN_DELETE_LINK': 'badge-danger',
+                'ACTIVATE_USER': 'badge-success',
+                'DEACTIVATE_USER': 'badge-warning',
+                'CHANGE_ROLE': 'badge-warning',
+                'ACTIVATE_LINK': 'badge-success',
+                'DEACTIVATE_LINK': 'badge-warning'
+            };
+            return classes[action] || 'badge-secondary';
+        }
+
+        function getActionIcon(action) {
+            const icons = {
+                'REGISTER': '👤',
+                'LOGIN': '🔐',
+                'CREATE_LINK': '🔗',
+                'DELETE_LINK': '🗑️',
+                'ADMIN_DELETE_LINK': '🗑️',
+                'ACTIVATE_USER': '✅',
+                'DEACTIVATE_USER': '❌',
+                'CHANGE_ROLE': '🔄',
+                'ACTIVATE_LINK': '✅',
+                'DEACTIVATE_LINK': '❌'
+            };
+            return icons[action] || '📝';
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById(`${type}Alert`);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading() {
+            const tbody = document.getElementById('logsTable');
+            tbody.innerHTML = '<tr><td colspan="5" class="loading">جاري تحميل البيانات...</td></tr>';
+        }
+
+        // تحديث تلقائي كل 30 ثانية
+        setInterval(() => {
+            loadLogs(currentPage);
+        }, 30000);
+    </script>
+</body>
+</html>

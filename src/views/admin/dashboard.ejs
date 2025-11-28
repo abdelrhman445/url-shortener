@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الأدمن - URL Shortener Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            color: #2d3748;
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== Sidebar ===== */
+        .admin-sidebar {
+            background: #2d3748;
+            color: white;
+            width: 280px;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            right: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid #4a5568;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-info {
+            background: #4a5568;
+            padding: 1.25rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .user-name {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            color: #cbd5e0;
+            margin-bottom: 0.75rem;
+        }
+
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .sidebar-links {
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #4a5568;
+            color: white;
+            border-right: 4px solid #667eea;
+        }
+
+        .sidebar-link i {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ===== Main Content ===== */
+        .admin-content {
+            flex: 1;
+            margin-right: 280px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        /* ===== Stats Overview ===== */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-align: center;
+            border-top: 4px solid #667eea;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        /* ===== Cards Layout ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f7fafc;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        /* ===== Tables ===== */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .table tr:hover {
+            background: #f7fafc;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        /* ===== Badges ===== */
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-inactive {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .badge-info {
+            background: #bee3f8;
+            color: #2a4365;
+            border: 1px solid #90cdf4;
+        }
+
+        .badge-warning {
+            background: #feebc8;
+            color: #744210;
+            border: 1px solid #fbd38d;
+        }
+
+        /* ===== Alerts ===== */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+            border: 1px solid;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #276749;
+            border-color: #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fff5f5;
+            color: #c53030;
+            border-color: #feb2b2;
+        }
+
+        /* ===== Empty States ===== */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* ===== Mobile Menu Button ===== */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            cursor: pointer;
+            z-index: 1001;
+            font-size: 1.25rem;
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(100%);
+                width: 100%;
+            }
+            
+            .admin-sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .admin-content {
+                margin-right: 0;
+                padding: 1rem;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-content {
+                padding: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ===== Loading States ===== */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+        }
+
+        .loading::before {
+            content: "⏳";
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+
+    <!-- Sidebar -->
+    <div class="admin-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">URL Shortener Pro</div>
+            <div class="user-info">
+                <div class="user-avatar"><%= user.name.charAt(0) %></div>
+                <div class="user-name"><%= user.name %></div>
+                <div class="user-email"><%= user.email %></div>
+                <span class="badge badge-success">أدمن</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-links">
+            <a href="/admin" class="sidebar-link active">
+                <i>📊</i>
+                لوحة التحكم
+            </a>
+            <a href="/admin/users" class="sidebar-link">
+                <i>👥</i>
+                إدارة المستخدمين
+            </a>
+            <a href="/admin/links" class="sidebar-link">
+                <i>🔗</i>
+                إدارة الروابط
+            </a>
+            <a href="/admin/logs" class="sidebar-link">
+                <i>📝</i>
+                سجلات النظام
+            </a>
+            <a href="/dashboard" class="sidebar-link">
+                <i>⚙️</i>
+                لوحة المستخدم
+            </a>
+            <a href="/logout" class="sidebar-link">
+                <i>🚪</i>
+                تسجيل الخروج
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-content">
+        <!-- Alerts -->
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number"><%= stats.totalUsers %></div>
+                <div class="stat-label">إجمالي المستخدمين</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= stats.totalLinks %></div>
+                <div class="stat-label">إجمالي الروابط</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= stats.totalClicks %></div>
+                <div class="stat-label">إجمالي النقرات</div>
+            </div>
+        </div>
+
+        <!-- Recent Data -->
+        <div class="cards-grid">
+            <!-- Recent Users -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i>👥</i>
+                        أحدث المستخدمين
+                    </h3>
+                    <a href="/admin/users" class="btn btn-primary btn-sm">عرض الكل</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>البريد</th>
+                                <th>الدور</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (recentUsers.length === 0) { %>
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <div class="empty-state-icon">👥</div>
+                                        لا توجد مستخدمين
+                                    </td>
+                                </tr>
+                            <% } else { %>
+                                <% recentUsers.forEach(user => { %>
+                                <tr>
+                                    <td><%= user.name %></td>
+                                    <td><%= user.email %></td>
+                                    <td>
+                                        <span class="status-badge <%= user.role === 'admin' ? 'badge-warning' : 'badge-info' %>">
+                                            <%= user.role === 'admin' ? 'أدمن' : 'مستخدم' %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(user.createdAt).toLocaleDateString('ar-EG') %></td>
+                                </tr>
+                                <% }) %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Links -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i>🔗</i>
+                        أحدث الروابط
+                    </h3>
+                    <a href="/admin/links" class="btn btn-primary btn-sm">عرض الكل</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>الرابط المختصر</th>
+                                <th>المستخدم</th>
+                                <th>النقرات</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (recentLinks.length === 0) { %>
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <div class="empty-state-icon">🔗</div>
+                                        لا توجد روابط
+                                    </td>
+                                </tr>
+                            <% } else { %>
+                                <% recentLinks.forEach(link => { %>
+                                <tr>
+                                    <td>
+                                        <a href="<%= baseUrl %>/<%= link.shortId %>" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 500;">
+                                            <%= baseUrl %>/<%= link.shortId %>
+                                        </a>
+                                    </td>
+                                    <td><%= link.createdBy.name %></td>
+                                    <td><%= link.clicks %></td>
+                                    <td>
+                                        <span class="status-badge <%= link.isActive ? 'status-active' : 'status-inactive' %>">
+                                            <%= link.isActive ? '✅ نشط' : '❌ معطل' %>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i>📝</i>
+                    أحدث السجلات
+                </h3>
+                <a href="/admin/logs" class="btn btn-primary btn-sm">عرض الكل</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>الإجراء</th>
+                            <th>المستخدم</th>
+                            <th>التفاصيل</th>
+                            <th>الوقت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (recentLogs.length === 0) { %>
+                            <tr>
+                                <td colspan="4" class="empty-state">
+                                    <div class="empty-state-icon">📝</div>
+                                    لا توجد سجلات
+                                </td>
+                            </tr>
+                        <% } else { %>
+                            <% recentLogs.forEach(log => { %>
+                            <tr>
+                                <td>
+                                    <span class="status-badge badge-info">
+                                        <%= getActionText(log.action) %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <% if (log.userId) { %>
+                                        <%= log.userEmail %>
+                                    <% } else { %>
+                                        نظام
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <%= getActionDetails(log.action, log.details) %>
+                                </td>
+                                <td><%= new Date(log.createdAt).toLocaleString('ar-EG') %></td>
+                            </tr>
+                            <% }) %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إدارة القائمة الجانبية على الجوال
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // إغلاق القائمة عند النقر خارجها
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // إظهار التنبيهات
+        function showAlert(message, type) {
+            const alert = document.getElementById(`${type}Alert`);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // معالجة التنبيهات من الـ URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const success = urlParams.get('success');
+        const error = urlParams.get('error');
+        
+        if (success) {
+            showAlert(decodeURIComponent(success), 'success');
+        }
+        if (error) {
+            showAlert(decodeURIComponent(error), 'error');
+        }
+
+        // وظائف مساعدة للعرض
+        function getActionText(action) {
+            const actions = {
+                'REGISTER': 'تسجيل جديد',
+                'LOGIN': 'تسجيل دخول',
+                'CREATE_LINK': 'إنشاء رابط',
+                'DELETE_LINK': 'حذف رابط',
+                'ACTIVATE_USER': 'تفعيل مستخدم',
+                'DEACTIVATE_USER': 'تعطيل مستخدم',
+                'CHANGE_ROLE': 'تغيير دور',
+                'ADMIN_DELETE_LINK': 'حذف رابط (أدمن)',
+                'ACTIVATE_LINK': 'تفعيل رابط',
+                'DEACTIVATE_LINK': 'تعطيل رابط'
+            };
+            return actions[action] || action;
+        }
+
+        function getActionDetails(action, details) {
+            if (!details) return '-';
+            
+            switch(action) {
+                case 'CREATE_LINK':
+                    return `إنشاء رابط: ${details.shortId}`;
+                case 'DELETE_LINK':
+                case 'ADMIN_DELETE_LINK':
+                    return `حذف رابط: ${details.linkId}`;
+                case 'ACTIVATE_USER':
+                case 'DEACTIVATE_USER':
+                    return `المستخدم: ${details.targetUserEmail}`;
+                case 'CHANGE_ROLE':
+                    return `من ${details.oldRole} إلى ${details.newRole}`;
+                default:
+                    return JSON.stringify(details);
+            }
+        }
+
+        // تحسين تجربة اللمس
+        document.addEventListener('touchstart', function() {}, { passive: true });
+
+        // إغلاق القائمة عند تغيير حجم النافذة
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

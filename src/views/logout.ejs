@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الخروج - URL Shortener Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        .logout-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 90%;
+            color: #333;
+        }
+
+        .logout-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .logout-title {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .logout-message {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #718096;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container">
+        <div class="logout-icon">👋</div>
+        <h1 class="logout-title">جاري تسجيل الخروج</h1>
+        <p class="logout-message">
+            يتم الآن تسجيل خروجك من النظام. سيتم توجيهك تلقائياً إلى صفحة تسجيل الدخول خلال ثوانٍ قليلة.
+        </p>
+        <div style="margin-bottom: 1.5rem;">
+            <span class="loading-spinner"></span>
+            <span style="color: #667eea; font-weight: 600;">جاري تسجيل الخروج...</span>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/login" class="btn">الذهاب لتسجيل الدخول</a>
+            <a href="/" class="btn btn-secondary">الصفحة الرئيسية</a>
+        </div>
+    </div>
+
+    <script>
+        // تنظيف الـ cookie وإعادة التوجيه بعد ثانيتين
+        setTimeout(() => {
+            // حذف الـ cookie
+            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            
+            // التوجيه إلى صفحة login
+            window.location.href = "/login";
+        }, 2000);
+    </script>
+</body>
+</html>

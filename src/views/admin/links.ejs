@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الروابط - URL Shortener Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .admin-sidebar {
+            background: #2d3748;
+            color: white;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 2rem 0;
+            overflow-y: auto;
+        }
+
+        .admin-content {
+            margin-right: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .sidebar-links {
+            padding: 1rem 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #4a5568;
+            color: white;
+            border-right: 4px solid #667eea;
+        }
+
+        .user-info {
+            padding: 1.5rem;
+            background: #4a5568;
+            margin: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge {
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #2d5016;
+        }
+
+        .badge-warning {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .badge-info {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .badge-danger {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .badge-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f7fafc;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        .search-box {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            width: 300px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f7fafc;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        }
+
+        .btn-warning {
+            background: #d69e2e;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #b7791f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(214, 158, 46, 0.3);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 1.25rem 1rem;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table tr:hover {
+            background: #f7fafc;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-inactive {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 45px;
+        }
+
+        .pagination button:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+            border: 1px solid;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #276749;
+            border-color: #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fff5f5;
+            color: #c53030;
+            border-color: #feb2b2;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .loading::before {
+            content: "⏳";
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .url-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .short-url {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .short-url:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+
+        .original-url {
+            color: #4a5568;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .click-count {
+            font-weight: 700;
+            color: #2d3748;
+            background: #edf2f7;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .admin-content {
+                margin-right: 0;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Icons */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .icon-link { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M13.723 18.654l-3.61 3.609c-2.316 2.315-6.063 2.315-8.378 0-2.315-2.316-2.315-6.062 0-8.378l3.61-3.61c.663-.662 1.555-1.027 2.5-1.027.945 0 1.837.365 2.5 1.027l1.5 1.5c.664.663 1.556 1.028 2.5 1.028s1.836-.365 2.5-1.028l3.61-3.61c.662-.663 1.027-1.555 1.027-2.5s-.365-1.837-1.027-2.5l-1.5-1.5c-.662-.663-1.555-1.027-2.5-1.027s-1.838.364-2.5 1.027l-3.61 3.61c-2.315 2.315-2.315 6.062 0 8.377l3.61 3.61z'/%3E%3C/svg%3E"); }
+        .icon-user { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"); }
+        .icon-search { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E"); }
+    </style>
+</head>
+<body>
+    <div class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="logo">URL Shortener Pro</div>
+            <div class="user-info">
+                <div style="font-weight: bold; margin-bottom: 0.5rem;"><%= user.name %></div>
+                <div style="font-size: 0.9rem; color: #cbd5e0;"><%= user.email %></div>
+                <span class="badge badge-success" style="margin-top: 0.5rem;">أدمن</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-links">
+            <a href="/admin" class="sidebar-link">📊 لوحة التحكم</a>
+            <a href="/admin/users" class="sidebar-link">👥 إدارة المستخدمين</a>
+            <a href="/admin/links" class="sidebar-link active">🔗 إدارة الروابط</a>
+            <a href="/admin/logs" class="sidebar-link">📝 سجلات النظام</a>
+            <a href="/dashboard" class="sidebar-link">⚙️ لوحة المستخدم</a>
+            <a href="/logout" class="sidebar-link">🚪 تسجيل الخروج</a>
+
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <div class="stats-overview" id="statsOverview">
+            <div class="stat-card">
+                <div class="stat-number" id="totalLinks">0</div>
+                <div class="stat-label">إجمالي الروابط</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeLinks">0</div>
+                <div class="stat-label">الروابط النشطة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalClicks">0</div>
+                <div class="stat-label">إجمالي النقرات</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="icon icon-link"></span>
+                    إدارة الروابط
+                </h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="position: relative;">
+                        <span class="icon icon-search" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5;"></span>
+                        <input type="text" id="searchInput" class="search-box" placeholder="ابحث في الروابط...">
+                    </div>
+                    <button id="searchBtn" class="btn btn-primary">
+                        <span class="icon icon-search"></span>
+                        بحث
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>الرابط المختصر</th>
+                            <th>الرابط الأصلي</th>
+                            <th>المستخدم</th>
+                            <th>النقرات</th>
+                            <th>الحالة</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="linksTable">
+                        <tr>
+                            <td colspan="7" class="loading">جاري تحميل البيانات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <!-- سيتم ملؤها بالجافاسكريبت -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentSearch = '';
+        const baseUrl = '<%= baseUrl %>';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLinks();
+            loadStats();
+            
+            document.getElementById('searchBtn').addEventListener('click', searchLinks);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchLinks();
+                }
+            });
+        });
+
+        async function loadLinks(page = 1, search = '') {
+            try {
+                showLoading();
+                const response = await fetch(`/admin/links/data?page=${page}&search=${search}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    renderLinks(data.links);
+                    renderPagination(data.page, data.pages);
+                    updateStats(data.links);
+                } else {
+                    showAlert('حدث خطأ في تحميل البيانات', 'error');
+                }
+            } catch (error) {
+                showAlert('حدث خطأ في الاتصال بالسيرفر', 'error');
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/admin/links/data?page=1&limit=1000');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStats(data.links);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function updateStats(links) {
+            const totalLinks = links.length;
+            const activeLinks = links.filter(link => link.isActive).length;
+            const totalClicks = links.reduce((sum, link) => sum + link.clicks, 0);
+
+            document.getElementById('totalLinks').textContent = totalLinks.toLocaleString();
+            document.getElementById('activeLinks').textContent = activeLinks.toLocaleString();
+            document.getElementById('totalClicks').textContent = totalClicks.toLocaleString();
+        }
+
+        function renderLinks(links) {
+            const tbody = document.getElementById('linksTable');
+            tbody.innerHTML = '';
+
+            if (links.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div>🔍</div>
+                            <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">لا توجد روابط</div>
+                            <div style="color: #a0aec0;">لم يتم العثور على روابط تطابق بحثك</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            links.forEach(link => {
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>
+                        <a href="${baseUrl}/${link.shortId}" target="_blank" class="short-url" title="انقر لفتح الرابط">
+                            ${baseUrl}/${link.shortId}
+                        </a>
+                    </td>
+                    <td class="url-cell">
+                        <span class="original-url" title="${link.originalUrl}">${link.originalUrl}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="icon icon-user"></span>
+                            ${link.createdBy.name}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="click-count">${link.clicks}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${link.isActive ? 'status-active' : 'status-inactive'}">
+                            ${link.isActive ? '✅ نشط' : '❌ معطل'}
+                        </span>
+                    </td>
+                    <td>${new Date(link.createdAt).toLocaleDateString('ar-EG')}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-${link.isActive ? 'warning' : 'success'} btn-sm toggle-link-btn" data-linkid="${link._id}">
+                                ${link.isActive ? '⏸️ إيقاف' : '▶️ تفعيل'}
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-link-btn" data-linkid="${link._id}">🗑️ حذف</button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+
+            // إضافة event listeners
+            document.querySelectorAll('.toggle-link-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const linkId = this.getAttribute('data-linkid');
+                    toggleLink(linkId);
+                });
+            });
+
+            document.querySelectorAll('.delete-link-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const linkId = this.getAttribute('data-linkid');
+                    deleteLink(linkId);
+                });
+            });
+        }
+
+        function renderPagination(currentPage, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '‹ السابق';
+                prevBtn.onclick = () => loadLinks(currentPage - 1, currentSearch);
+                pagination.appendChild(prevBtn);
+            }
+
+            // عرض صفحات محيطة بالصفحة الحالية فقط
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.className = i === currentPage ? 'active' : '';
+                button.onclick = () => loadLinks(i, currentSearch);
+                pagination.appendChild(button);
+            }
+
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = 'التالي ›';
+                nextBtn.onclick = () => loadLinks(currentPage + 1, currentSearch);
+                pagination.appendChild(nextBtn);
+            }
+        }
+
+        async function toggleLink(linkId) {
+            if (!confirm('هل أنت متأكد من تغيير حالة هذا الرابط؟')) return;
+
+            try {
+                const response = await fetch(`/admin/links/${linkId}/toggle`, {
+                    method: 'PATCH'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    loadLinks(currentPage, currentSearch);
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('حدث خطأ في الاتصال بالسيرفر', 'error');
+            }
+        }
+
+        async function deleteLink(linkId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الرابط؟\nهذا الإجراء لا يمكن التراجع عنه.')) return;
+
+            try {
+                const response = await fetch(`/admin/links/${linkId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('✅ ' + data.message, 'success');
+                    loadLinks(currentPage, currentSearch);
+                } else {
+                    showAlert('❌ ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ حدث خطأ في الاتصال بالسيرفر', 'error');
+            }
+        }
+
+        function searchLinks() {
+            currentSearch = document.getElementById('searchInput').value;
+            currentPage = 1;
+            loadLinks(currentPage, currentSearch);
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById(`${type}Alert`);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading() {
+            const tbody = document.getElementById('linksTable');
+            tbody.innerHTML = '<tr><td colspan="7" class="loading">جاري تحميل البيانات...</td></tr>';
+        }
+
+        // تحديث تلقائي كل 30 ثانية
+        setInterval(() => {
+            loadLinks(currentPage, currentSearch);
+        }, 30000);
+    </script>
+</body>
+</html>

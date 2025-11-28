@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين - URL Shortener Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .admin-sidebar {
+            background: #2d3748;
+            color: white;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 2rem 0;
+        }
+
+        .admin-content {
+            margin-right: 250px;
+            padding: 2rem;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .sidebar-links {
+            padding: 1rem 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #4a5568;
+            color: white;
+            border-right: 4px solid #667eea;
+        }
+
+        .user-info {
+            padding: 1.5rem;
+            background: #4a5568;
+            margin: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge {
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #2d5016;
+        }
+
+        .badge-warning {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .badge-info {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .badge-danger {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .search-box {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 300px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-warning {
+            background: #d69e2e;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #b7791f;
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.7rem;
+            font-size: 0.8rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #2d5016;
+        }
+
+        .status-inactive {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #2d5016;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .admin-content {
+                margin-right: 0;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="logo">URL Shortener Pro</div>
+            <div class="user-info">
+                <div style="font-weight: bold; margin-bottom: 0.5rem;"><%= user.name %></div>
+                <div style="font-size: 0.9rem; color: #cbd5e0;"><%= user.email %></div>
+                <span class="badge badge-success" style="margin-top: 0.5rem;">أدمن</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-links">
+            <a href="/admin" class="sidebar-link">لوحة التحكم</a>
+            <a href="/admin/users" class="sidebar-link active">إدارة المستخدمين</a>
+            <a href="/admin/links" class="sidebar-link">إدارة الروابط</a>
+            <a href="/admin/logs" class="sidebar-link">سجلات النظام</a>
+            <a href="/dashboard" class="sidebar-link">لوحة المستخدم</a>
+            <a href="/logout" class="sidebar-link">🚪 تسجيل الخروج</a>
+
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">إدارة المستخدمين</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" id="searchInput" class="search-box" placeholder="بحث بالاسم أو البريد...">
+                    <button id="searchBtn" class="btn btn-primary">بحث</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>الدور</th>
+                            <th>الحالة</th>
+                            <th>تاريخ التسجيل</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <tr>
+                            <td colspan="6" class="loading">جاري تحميل البيانات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <!-- سيتم ملؤها بالجافاسكريبت -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentSearch = '';
+
+        // تحميل البيانات عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+            
+            // إضافة event listeners للأزرار
+            document.getElementById('searchBtn').addEventListener('click', searchUsers);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchUsers();
+                }
+            });
+        });
+
+        async function loadUsers(page = 1, search = '') {
+            try {
+                showLoading();
+                const response = await fetch(`/admin/users/data?page=${page}&search=${search}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    renderUsers(data.users);
+                    renderPagination(data.page, data.pages);
+                } else {
+                    showAlert('حدث خطأ في تحميل البيانات', 'error');
+                }
+            } catch (error) {
+                showAlert('حدث خطأ في الاتصال بالسيرفر', 'error');
+            }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">لا توجد نتائج</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span class="badge ${user.role === 'admin' ? 'badge-warning' : 'badge-info'}">
+                            ${user.role === 'admin' ? 'أدمن' : 'مستخدم'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
+                            ${user.isActive ? 'نشط' : 'معطل'}
+                        </span>
+                    </td>
+                    <td>${new Date(user.createdAt).toLocaleDateString('ar-EG')}</td>
+                    <td>
+                        <div class="action-buttons">
+                            ${user._id !== '<%= user._id %>' ? `
+                                <button class="btn btn-${user.isActive ? 'danger' : 'success'} btn-sm toggle-user-btn" data-userid="${user._id}">
+                                    ${user.isActive ? 'تعطيل' : 'تفعيل'}
+                                </button>
+                                <button class="btn btn-warning btn-sm change-role-btn" data-userid="${user._id}" data-currentrole="${user.role}">
+                                    ${user.role === 'admin' ? 'تحويل لمستخدم' : 'ترقية لأدمن'}
+                                </button>
+                            ` : '<span style="color: #666;">حسابك</span>'}
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+
+            // إضافة event listeners للأزرار الديناميكية
+            document.querySelectorAll('.toggle-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-userid');
+                    toggleUser(userId);
+                });
+            });
+
+            document.querySelectorAll('.change-role-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-userid');
+                    const currentRole = this.getAttribute('data-currentrole');
+                    changeRole(userId, currentRole);
+                });
+            });
+        }
+
+        function renderPagination(currentPage, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // زر الصفحة السابقة
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '‹';
+                prevBtn.onclick = () => loadUsers(currentPage - 1, currentSearch);
+                pagination.appendChild(prevBtn);
+            }
+
+            // أزرار الصفحات
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.className = i === currentPage ? 'active' : '';
+                button.onclick = () => loadUsers(i, currentSearch);
+                pagination.appendChild(button);
+            }
+
+            // زر الصفحة التالية
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = '›';
+                nextBtn.onclick = () => loadUsers(currentPage + 1, currentSearch);
+                pagination.appendChild(nextBtn);
+            }
+        }
+
+        async function toggleUser(userId) {
+            if (!confirm('هل أنت متأكد من تغيير حالة هذا المستخدم؟')) return;
+
+            try {
+                const response = await fetch(`/admin/users/${userId}/toggle`, {
+                    method: 'PATCH'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    loadUsers(currentPage, currentSearch);
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('حدث خطأ في الاتصال بالسيرفر', 'error');
+            }
+        }
+
+        async function changeRole(userId, currentRole) {
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            const message = `هل أنت متأكد من ${newRole === 'admin' ? 'ترقية' : 'تخفيض'} دور هذا المستخدم؟`;
+
+            if (!confirm(message)) return;
+
+            try {
+                const response = await fetch(`/admin/users/${userId}/role`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    loadUsers(currentPage, currentSearch);
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('حدث خطأ في الاتصال بالسيرفر', 'error');
+            }
+        }
+
+        function searchUsers() {
+            currentSearch = document.getElementById('searchInput').value;
+            currentPage = 1;
+            loadUsers(currentPage, currentSearch);
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById(`${type}Alert`);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading() {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">جاري تحميل البيانات...</td></tr>';
+        }
+    </script>
+</body>
+</html>
