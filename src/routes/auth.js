@@ -34,6 +34,4 @@ router.get('/me', auth, getMe);
 router.get('/login', (req, res) => res.render('auth/login'));
 router.get('/register', (req, res) => res.render('auth/register'));
 router.get('/', (req, res) => res.render('home'));
-router.get('/logout', auth, logout);
-
-module.exports = router; 
+// تم إزالة route الـ logout من هنا لأنه موجود في server.js
