@@ -5,8 +5,19 @@ const useragent = require('useragent');
 
 const router = express.Router();
 
+// ==================== 🔧 إضافة: قائمة بالـ routes المحجوزة ====================
+const reservedPaths = [
+  'login', 'register', 'logout', 'dashboard', 'admin', 
+  'api', 'health', 'favicon.ico', 'home'
+];
+
 router.get('/:shortId', async (req, res) => {
   try {
+    // تحقق إذا كان المسار محجوزاً
+    if (reservedPaths.includes(req.params.shortId)) {
+      return next(); // انتقل للـ route التالي
+    }
+
     const link = await Link.findOne({ shortId: req.params.shortId, isActive: true });
     
     if (!link) {
