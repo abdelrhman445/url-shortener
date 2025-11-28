@@ -43,10 +43,11 @@ app.get('/logout', (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     expires: new Date(0),
-    path: '/'
+    path: '/',
+    sameSite: 'lax'
   });
   
-  res.render('logout');
+  res.redirect('/login');
 });
 // ==================== نهاية إضافة route الـ logout ====================
 
