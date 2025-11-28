@@ -1,5 +1,3 @@
-[file name]: server.js
-[file content begin]
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -57,15 +55,11 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
 
-// ==================== 🔧 التعديل المهم: وضع redirect routes أولاً ====================
-// يجب أن تكون routes التوجيه قبل أي middleware يحتاج auth
-app.use('/', require('./src/routes/redirect'));
-
-// ثم routes الأخرى التي تحتاج auth
+// Routes
 app.use('/', require('./src/routes/auth'));
 app.use('/dashboard', require('./src/routes/dashboard'));
 app.use('/admin', require('./src/routes/admin'));
-// ==================== نهاية التعديل ====================
+app.use('/', require('./src/routes/redirect'));
 
 // Health check endpoint for Vercel
 app.get('/health', (req, res) => {
@@ -126,4 +120,3 @@ if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
 
 // Export for Vercel
 module.exports = app;
-[file content end]
