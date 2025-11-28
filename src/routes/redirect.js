@@ -5,8 +5,8 @@ const useragent = require('useragent');
 
 const router = express.Router();
 
-// صفحة وسيطة للريدايركت
-router.get('/r/:shortId', async (req, res) => {
+// علشان الخصوصية - نعمل صفحة وسيطة للكل
+router.get('/:shortId', async (req, res) => {
   try {
     const link = await Link.findOne({ shortId: req.params.shortId, isActive: true });
     
@@ -14,6 +14,7 @@ router.get('/r/:shortId', async (req, res) => {
       return res.status(404).render('404');
     }
 
+    // نخلي كل الروابط تروح على الصفحة الوسيطة
     res.render('redirect', {
       targetUrl: link.originalUrl,
       shortId: link.shortId,
@@ -54,23 +55,6 @@ router.get('/go/:shortId', async (req, res) => {
     res.redirect(link.originalUrl);
   } catch (error) {
     console.error('Redirect error:', error);
-    res.status(500).render('500');
-  }
-});
-
-// للحفاظ على التوافق مع الروابط القديمة
-router.get('/:shortId', async (req, res) => {
-  try {
-    const link = await Link.findOne({ shortId: req.params.shortId, isActive: true });
-    
-    if (!link) {
-      return res.status(404).render('404');
-    }
-
-    // إعادة التوجيه إلى صفحة المعاينة بدلاً من الرابط المباشر
-    res.redirect(`/r/${req.params.shortId}`);
-  } catch (error) {
-    console.error('Legacy redirect error:', error);
     res.status(500).render('500');
   }
 });
