@@ -24,15 +24,15 @@ const loginValidation = [
   body('password').notEmpty().withMessage('كلمة المرور مطلوبة')
 ];
 
-// ==================== 🔧 إصلاح: تعريف Routes بشكل صحيح ====================
-// Render pages - يجب أن تكون قبل الـ API routes
+// ==================== 🔧 إصلاح: إرجاع المسارات إلى وضعها الطبيعي ====================
+// Render pages
 router.get('/login', (req, res) => {
-  console.log('✅ /login route accessed');
+  console.log('✅ GET /login route accessed');
   res.render('auth/login');
 });
 
 router.get('/register', (req, res) => {
-  console.log('✅ /register route accessed');
+  console.log('✅ GET /register route accessed');
   res.render('auth/register');
 });
 
@@ -41,11 +41,11 @@ router.get('/', (req, res) => {
   res.render('home');
 });
 
-// API routes
-router.post('/api/register', authLimiter, registerValidation, register);
-router.post('/api/login', authLimiter, loginValidation, login);
-router.post('/api/logout', auth, logout);
-router.get('/api/me', auth, getMe);
+// API routes - استخدام نفس المسارات بدون /api
+router.post('/login', authLimiter, loginValidation, login);
+router.post('/register', authLimiter, registerValidation, register);
+router.post('/logout', auth, logout);
+router.get('/me', auth, getMe);
 // ==================== نهاية الإصلاح ====================
 
 module.exports = router;
