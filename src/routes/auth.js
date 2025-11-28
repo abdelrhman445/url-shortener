@@ -8,7 +8,7 @@ const router = express.Router();
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // زيادة الحد ليكون أكثر مرونة
+  max: 10,
   message: { error: 'محاولات تسجيل دخول كثيرة، حاول مرة أخرى بعد 15 دقيقة' }
 });
 
@@ -27,13 +27,12 @@ const loginValidation = [
 // API routes
 router.post('/register', authLimiter, registerValidation, register);
 router.post('/login', authLimiter, loginValidation, login);
-router.post('/logout', auth, logout);
+router.post('/logout', logout); // إزالة auth middleware علشان التسجيل الخروج
 router.get('/me', auth, getMe);
 
 // Render pages
 router.get('/login', (req, res) => res.render('auth/login'));
 router.get('/register', (req, res) => res.render('auth/register'));
 router.get('/', (req, res) => res.render('home'));
-router.get('/logout', auth, logout);
 
-module.exports = router; 
+module.exports = router;
