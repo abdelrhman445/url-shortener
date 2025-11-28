@@ -3,7 +3,12 @@ const User = require('../models/User');
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
+    let token = req.cookies?.token;
+    
+    // إذا مفيش token في الكوكيز، نشوف في الـ header
+    if (!token && req.headers.authorization) {
+      token = req.headers.authorization.replace('Bearer ', '');
+    }
     
     if (!token) {
       return res.redirect('/login');
@@ -13,12 +18,26 @@ const auth = async (req, res, next) => {
     const user = await User.findById(decoded.id).select('-password');
     
     if (!user || !user.isActive) {
+      // إذا المستخدم مش موجود أو مش نشط، نمسح الكوكي
+      res.cookie('token', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        expires: new Date(0),
+        path: '/'
+      });
       return res.redirect('/login');
     }
 
     req.user = user;
     next();
   } catch (error) {
+    // إذا كان التوكن منتهي أو غير صالح، نمسح الكوكي ونوجه لل login
+    res.cookie('token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(0),
+      path: '/'
+    });
     res.redirect('/login');
   }
 };
