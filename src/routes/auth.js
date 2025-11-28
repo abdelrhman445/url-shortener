@@ -8,7 +8,7 @@ const router = express.Router();
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // زيادة الحد ليكون أكثر مرونة
+  max: 10,
   message: { error: 'محاولات تسجيل دخول كثيرة، حاول مرة أخرى بعد 15 دقيقة' }
 });
 
@@ -24,15 +24,28 @@ const loginValidation = [
   body('password').notEmpty().withMessage('كلمة المرور مطلوبة')
 ];
 
-// API routes
-router.post('/register', authLimiter, registerValidation, register);
-router.post('/login', authLimiter, loginValidation, login);
-router.post('/logout', auth, logout);
-router.get('/me', auth, getMe);
+// ==================== 🔧 إصلاح: تعريف Routes بشكل صحيح ====================
+// Render pages - يجب أن تكون قبل الـ API routes
+router.get('/login', (req, res) => {
+  console.log('✅ /login route accessed');
+  res.render('auth/login');
+});
 
-// Render pages
-router.get('/login', (req, res) => res.render('auth/login'));
-router.get('/register', (req, res) => res.render('auth/register'));
-router.get('/', (req, res) => res.render('home'));
+router.get('/register', (req, res) => {
+  console.log('✅ /register route accessed');
+  res.render('auth/register');
+});
+
+router.get('/', (req, res) => {
+  console.log('✅ Home route accessed');
+  res.render('home');
+});
+
+// API routes
+router.post('/api/register', authLimiter, registerValidation, register);
+router.post('/api/login', authLimiter, loginValidation, login);
+router.post('/api/logout', auth, logout);
+router.get('/api/me', auth, getMe);
+// ==================== نهاية الإصلاح ====================
 
 module.exports = router;
