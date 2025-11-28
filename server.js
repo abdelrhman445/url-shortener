@@ -55,17 +55,17 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
 
-// ==================== 🔧 الترتيب الصحيح النهائي ====================
-// 1. Routes العامة (بدون auth)
+// ==================== 🔧 الترتيب النهائي للـ Routes ====================
+// Routes العامة (بدون auth)
 app.use('/', require('./src/routes/auth'));
 
-// 2. Routes المحمية (تتطلب auth)
+// Routes التوجيه (يجب أن تكون قبل الـ routes المحمية)
+app.use('/', require('./src/routes/redirect'));
+
+// Routes المحمية (تتطلب auth)
 app.use('/dashboard', require('./src/routes/dashboard'));
 app.use('/admin', require('./src/routes/admin'));
-
-// 3. Routes التوجيه (يجب أن تكون آخر شيء)
-app.use('/', require('./src/routes/redirect'));
-// ==================== نهاية الترتيب ====================
+// ==================== نهاية التعديل ====================
 
 // Health check endpoint for Vercel
 app.get('/health', (req, res) => {
