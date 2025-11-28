@@ -55,11 +55,15 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
 
-// Routes
+// ==================== 🔧 التعديل المهم: وضع redirect routes أولاً ====================
+// يجب أن تكون routes التوجيه قبل أي middleware يحتاج auth
+app.use('/', require('./src/routes/redirect'));
+
+// ثم routes الأخرى التي تحتاج auth
 app.use('/', require('./src/routes/auth'));
 app.use('/dashboard', require('./src/routes/dashboard'));
 app.use('/admin', require('./src/routes/admin'));
-app.use('/', require('./src/routes/redirect'));
+// ==================== نهاية التعديل ====================
 
 // Health check endpoint for Vercel
 app.get('/health', (req, res) => {
